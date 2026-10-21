@@ -13,10 +13,13 @@
 
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { setCurrentUser } from '../utils/watchlist';
 
 // Main App component
 const Signup = () =>  {
-  const [isLogin, setIsLogin] = useState(true); // State to toggle between login and signup
+  const navigate = useNavigate();
+  const [isLogin, setIsLogin] = useState(false); // State to toggle between login and signup
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -24,72 +27,58 @@ const Signup = () =>  {
   const [message, setMessage] = useState('');
   const [showOtpInput, setShowOtpInput] = useState(false); // New state to control OTP section visibility
 
-  // Image slider states and data
   const images = [
-    'https://placehold.co/400x600/000000/FFFFFF?text=Image+1',
-    'https://placehold.co/400x600/333333/FFFFFF?text=Image+2',
-    'https://placehold.co/400x600/666666/FFFFFF?text=Image+3',
-    // You can replace these with your actual image URLs
+    '/Movie_content/1299334.jpg',
+    '/Movie_content/20th_Century_Girl.jpg',
+    '/Movie_content/spirited-away-4k-upscaled-samples-v0-7uhyv9zj4dea1.webp',
   ];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Effect for automatic image sliding
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) =>
-        (prevIndex + 1) % images.length
-      );
-    }, 5000); // Change image every 5 seconds (5000 milliseconds)
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 5000);
 
-    // Cleanup the interval on component unmount
     return () => clearInterval(interval);
-  }, [images.length]); // Re-run effect if the number of images changes
+  }, [images.length]);
 
   // Handle form submission (Login/Signup)
   const handleSubmit = (e) => {
     e.preventDefault();
-    setMessage(''); // Clear previous messages
+    setMessage('');
 
     if (isLogin) {
-      // Login logic
       if (email && password) {
-        // Simulate OTP being sent after initial login attempt
-        setMessage('OTP sent to your email! Please verify.');
-        setShowOtpInput(true); // Show OTP input section
-        console.log('Login attempt with:', { email, password });
+        const username = email.split('@')[0];
+        setCurrentUser({ email, name: username });
+        setMessage(`Welcome back, ${username}! Redirecting...`);
+        setTimeout(() => navigate('/'), 1200);
       } else {
         setMessage('Please enter both email and password.');
       }
     } else {
-      // Signup logic
       if (password !== confirmPassword) {
         setMessage('Passwords do not match.');
         return;
       }
       if (email && password && confirmPassword) {
-        setMessage('Signup successful! (This is a demo)');
-        console.log('Signing up with:', { email, password });
+        const username = email.split('@')[0];
+        setCurrentUser({ email, name: username });
+        setMessage('Account created! Welcome to Ami Watch. Redirecting...');
+        setTimeout(() => navigate('/'), 1200);
       } else {
         setMessage('Please fill in all fields.');
       }
-      // For signup, we don't show OTP by default, reset OTP state
-      setShowOtpInput(false);
-      setOtp('');
     }
   };
 
   // Handle Verify OTP button click
   const handleVerifyOtp = () => {
     if (otp) {
-      setMessage('OTP verified! Login successful. (This is a demo)');
-      console.log('Verifying OTP:', otp);
-      // In a real app, you would proceed with user authentication here
-      // Clear form fields after successful verification
-      setEmail('');
-      setPassword('');
-      setConfirmPassword('');
-      setOtp('');
-      setShowOtpInput(false); // Hide OTP section
+      const username = email ? email.split('@')[0] : 'Member';
+      setCurrentUser({ email: email || 'user@amiwatch.com', name: username });
+      setMessage('OTP verified! Redirecting to home...');
+      setTimeout(() => navigate('/'), 1200);
     } else {
       setMessage('Please enter the OTP.');
     }
@@ -97,9 +86,9 @@ const Signup = () =>  {
 
   // Handle Google Sign-in
   const handleGoogleSignIn = () => {
-    setMessage('Signing in with Google... (This is a demo)');
-    console.log('Initiating Google Sign-in');
-    // In a real app, this would trigger Firebase/OAuth Google sign-in flow
+    setCurrentUser({ email: 'google.user@amiwatch.com', name: 'Google Member' });
+    setMessage('Signed in with Google! Redirecting...');
+    setTimeout(() => navigate('/'), 1200);
   };
 
   return (
