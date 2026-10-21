@@ -1,0 +1,606 @@
+*
+{
+    margin: 0;
+    padding: 0;
+   
+    
+}
+body
+{
+    
+    background-color: black !important;
+     
+      
+}
+.home_page_frame
+{
+    max-width: 1920px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+nav
+{
+    /* background-color: #ec3434; */
+     background-image: linear-gradient(180deg,  rgba(7, 7, 7, 0.575) ,rgba(172, 172, 172, 0) );
+    /* position: fixed; */
+    width: 100%;
+    height: 100px;
+    z-index: 999;
+    /* position: fixed; */
+    z-index: 10;
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+     backdrop-filter: blur(4px);
+    /* background: rgba(255, 255, 255, 0.3);  */
+
+   
+}
+.Upper_frame
+{
+    /* position: relative; */
+}
+.nav-content
+/* {  position: absolute; */
+{
+    width: 90%;
+    height: 100%;
+    font-family: "Inter", sans-serif;
+    /* font-weight: 600; */
+    /* background-color: #992d2d; */
+    margin-left: 5%;
+   
+   color: rgb(255, 255, 255);
+   
+    display: flex;
+    align-items: center;
+    gap: 5%;
+    
+}
+.nav-content .content_box {
+    
+    font-size: 20px;
+   font-weight: 600;
+}
+.Search
+{   
+    display: flex;
+    margin-left: 15%;
+    border-radius: 30px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    background-color: rgba(255, 255, 255, 0.26);
+    color: #fff;
+}
+.Search input
+{
+    width: 70%;
+    height: 30px;
+    /* margin-left: 50px; */
+    border: none;
+    outline: none;
+    background-color: rgba(255, 255, 255, 0);
+    font-size: 20px;
+    font-family: "Inter", sans-serif;
+    color: white;
+}
+.Search input[type="text"]::placeholder {
+    color: white; 
+    font-family: "Inter", sans-serif;
+    font-size: 20px;
+}
+.Search .Finder 
+{
+    font-size: 15px;
+}
+#Browse
+{
+    display: flex;
+    align-items: center;
+}
+.Account_Details 
+{
+    display: flex;
+    align-items: center;
+    gap: 10%;
+    margin-left: 5%;
+}
+.Account_details_box
+{
+    display: flex;
+    flex-direction: column;
+}
+#Signin
+{
+    font-weight: 800;
+    
+}
+.Crousal_section
+{
+    position: relative;
+}
+.first_swiper-container {
+    overflow: hidden; /* Contains slides within the visible area */
+    /* position: relative; */
+    position: absolute;
+    width: 100%; /* Ensure Swiper container takes full width */
+    height: 850px /* Adjust as needed */
+  }
+  
+  .swiper {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .swiper-slide {
+    text-align: center;
+    font-size: 18px;
+    /* background: #da0a0a; */
+    position: relative;
+    height: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Only include these if necessary */
+    /* backface-visibility: visible; */
+    /* transform: none; */
+  }
+  
+  .swiper-slide img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures images cover the entire slide */
+  }
+ .Down-shadow
+ {
+    width: 100%;
+    height: 430px;
+    background-image: linear-gradient(180deg, rgba(0, 0, 0, 0),rgba(0, 0, 0, 0.719),rgb(0, 0, 0));
+    position: absolute;
+    z-index: 4;
+    top: calc(850px/2);
+ }
+ .crousal-content
+ {
+    width: 50%;
+    height: auto;
+    /* background-image: linear-gradient(180deg, rgba(0, 0, 0, 0),rgba(0, 0, 0, 1)); */
+    /* background-color: red; */
+    position: absolute;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    top: calc(850px/2);
+    gap: 10px;
+
+ }
+ .crousal-content .Movies,.Description
+ {
+    width: auto;
+    height: auto;
+    /* background-color: red; */
+    display: flex;
+    text-align: left;
+    padding-left: 70px;
+    font-family: "Inter", sans-serif;
+    gap: 40px;
+    color: #fff;
+ }
+ .Movies
+ {  
+    font-size: 64px;
+    font-weight: 600;
+    text-transform: uppercase;
+    
+    letter-spacing: 10px;
+ }
+ .crousal-content .Features
+ {
+     display: flex;
+    
+     align-items: center;
+     font-size: 16px;
+     font-weight: 600;
+     /* justify-content: space-around; */
+     gap: 30px;
+     /* background-color: red; */
+     display: flex;
+     text-align: left;
+     padding-left: 70px;
+     font-family: "Inter", sans-serif;
+     gap: 40px;
+     color: #fff;
+     /* background-color: #ffffff; */
+ }
+.Line
+ {
+    width: 2px;
+    height: 30px;
+    background-color: white
+ }
+ .Description
+ {
+    font-size: 20px;
+ }
+
+ .swiper-pagination-bullet
+{   width: 35px !important;
+    height: 7px !important;
+    border-radius: 5px !important;
+
+    background: #F3F3F3  !important;
+    transition: all 0.5s ease;
+}
+
+.Play,.Add-to-list
+{
+    width: 182px;
+    height: 71px;
+    border-radius: 5px;
+    /* background-color: red; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.Play
+{
+    background-color: rgba(234, 105, 19, 0.63);
+}
+.Play:hover {
+    background-color: rgba(234, 105, 19, 0.90);
+    transition: all  0.5s ease ;
+    cursor: pointer;
+  }
+.Add-to-list
+{
+    background-color: rgba(255, 255, 255, 0.21);
+    border: 2px solid rgba(255, 255, 255, 1);
+}
+.Add-to-list:hover {
+    background-color: rgba(255, 255, 255, 0.40);
+    transition: all  0.5s ease ;
+    cursor: pointer;
+  }
+.Child_play
+{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.Lower_frame_Top_Pickups
+{
+/* width: 100%; */
+max-width: 1900px;
+/* border: 1px solid red; */
+height: 727px;
+margin-top: 950px;
+/* display: block; */
+background-color: black;
+font-family: "Inter", sans-serif;
+display: flex;
+flex-direction: column;
+justify-content: left;
+/* align-items: center; */
+gap: 40px;
+padding-left: 80px;
+margin-left: auto;
+margin-right: auto;
+}
+.Movie_list
+{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    margin: 0;
+    width: 90%;
+    
+}
+.Title_pickup
+{
+    color: #F3F3F3;
+    font-size: 32px;
+    font-weight: 800;
+    max-width: 1900px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.Title_pickup .right_arrow
+{
+
+    font-size: 50px;
+}
+
+.Movie_list .Movies
+{
+    display:flex;
+    flex-direction: column;
+    /* align-items: center; */
+    /* justify-content: center; */
+    /* gap: 20px; */
+    width: 255px;
+    height: 500px;
+    /* background-color: red; */
+    color: #F3F3F3;
+    
+}
+
+.Movie_image img
+{
+    width: 100%  !important;
+    height: 377px !important;
+    /* Movie_image */
+    object-fit: cover;
+}
+
+.Movie_name
+{
+    width: auto ;
+    height: auto;
+    font-size: 20px;
+    display:flex;
+    align-items: center;
+    color: #F3F3F3;
+    text-align: left;
+    margin-top: 10px;
+    
+    letter-spacing: 0px;
+    font-weight: 500;
+.Movie_name {
+    line-height: 1; /* Replace 'line-spacing' with 'line-height' */
+}
+    /* background-color: green;     */
+}
+.second_swiper-slide .Features
+{
+    width: auto ;
+    height: auto;
+    font-size: 20px;
+    font-weight: 600;
+    /* background-color: blue; */
+    color: #F3F3F3;
+    display:flex;
+    align-items: center;
+    padding: 0;
+    font-weight: 800;
+    letter-spacing: 0px;
+    margin: auto;
+    padding: auto;
+}
+.c-scrollbar_thumb {
+    background: rgba(234, 105, 19, 1) !important; 
+  }
+
+
+
+  
+  .Second_swiper {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .second_swiper-slide {
+    text-align: center !important;
+    font-size: 18px !important;
+    background: black !important;
+    display: flex !important;
+    justify-content: space-evenly !important;
+    align-items: center !important;
+    width: 400px !important;
+    
+  }
+  /* .Second_swiper-wrapper
+  {
+     display:flex;
+     justify-content: center;
+     align-items: center;
+     gap: 50px;
+
+  } */
+  
+  .second_swiper-slide img {
+    display: block !important;
+    width: 100% !important;
+    /* height: 100% !important; */
+    object-fit: cover !important; /* Ensures images cover the entire slide */
+  }
+  .swiper-button-prev ,.swiper-button-next
+  {
+     color: rgba(234, 105, 19, 0.63) !important;
+    
+  }
+  
+  /* Scrollbar for the entire page */
+::-webkit-scrollbar {
+    width: 4px; /* Width of the scrollbar */
+  }
+  
+  /* Track (background) */
+  ::-webkit-scrollbar-track {
+    background: #1e1e1e; /* Dark background */
+    border-radius: 5px;
+  }
+  
+  /* Handle (thumb) */
+  ::-webkit-scrollbar-thumb {
+    background: rgba(234, 105, 19, 1); /* Green scrollbar */
+    border-radius: 5px;
+  }
+  
+  /* Handle on hover */
+ .Link
+ {
+    color: white;
+    text-decoration: none;
+ }
+  @media (max-width:640px) {
+   *,body,#root
+   {
+    width: 390px;
+   }
+   .first_swiper-container {
+    overflow: hidden; /* Contains slides within the visible area */
+    width: 100%; /* Ensure Swiper container takes full width */
+    height: 450px /* Adjust as needed */
+  }
+  .Down-shadow
+ {
+    height: 450px;
+    top: 50px;
+ }
+ .crousal-content
+ {
+    width: 70%;
+    max-height: 272px;
+   top: 150px;
+    
+
+ }
+ .crousal-content .Movies , .Features ,.Description
+ {
+    width: auto;
+    height: auto;
+    /* background-color: red; */
+    display: flex;
+    text-align: left;
+    padding-left: 20px;
+    font-family: "Inter", sans-serif;
+    /* gap: 40px; */
+    color: #fff;
+ }
+ .Movies{
+    font-size: 20px;
+    font-weight: 800;
+ }
+ .Features
+ {
+    font-size: 18px;
+    font-weight: 500;
+    padding: 0px !important;
+
+ }
+ .Description
+ {
+    font-size: 10px;
+    gap: 20px;
+ }
+ .Play,.Add-to-list
+{
+    width: 100px;
+    height: 60px;
+   
+}
+.Child_play
+{
+    width: 100%;
+    gap: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+i.Child_arrow
+{
+    font-size: 20px;
+    margin-right: 0px;
+    width: 20px;
+    margin-right: 5px;
+    
+    
+}
+.Lower_frame_Top_Pickups
+{
+    width: 100%;
+    height: 350px;
+    /* max-width: 390px; */
+    /* border: 1px solid red; */
+    /* height: 727px; */
+    margin-top: 450px;
+    /* display: block; */
+  
+    /* align-items: center; */
+    gap: 0px;
+    padding-left: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.Movie_list
+{
+    width: 90%;
+    gap: 40px;
+}
+.swiper-button-prev ,.swiper-button-next
+{
+    font-size: 20px;
+}
+.Movie_list .swiper-wrapper
+{
+    width: 100%;
+    gap: 40px;
+    display: flex;
+    justify-content: space-around;
+}
+nav
+{
+    display: none;
+}
+.Movie_image img
+{
+    width: 100px!important;
+    height: 150px !important;
+    /* Movie_image */
+    object-fit: cover;
+}
+/* .Movies
+{
+    width: 100px!important;
+    height: 150px !important;
+} */
+ /* .Movies_Second
+ {
+    width: 100px!important;
+    height: 150px !important;
+ } */
+.second_swiper-slide
+{
+    width: 100px !important;
+}
+.Title_pickup
+{
+    width: 300px !important;
+    height: 50px;
+    font-size: 10px;
+}      
+.swiper-button-prev ,.swiper-button-next
+  {
+     display: none !important;
+    
+  }    
+.Movie_name
+{
+    font-size: 12px!important;
+    height: auto;
+    width: 100px !important;
+    justify-content: left !important;
+
+}
+.Features
+{
+    padding-left: 0px;
+    font-size: 10px!important;
+}
+.Main_box
+{
+    display: none !important;
+}
+  }
+  

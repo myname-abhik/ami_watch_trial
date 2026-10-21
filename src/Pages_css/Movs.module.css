@@ -1,0 +1,346 @@
+
+.Main_containerr
+{
+    background-color: #922929;
+    max-width: 1920px;
+    height: 100vh;
+    position: relative;
+    overflow-x: hidden !important;
+    /* overflow-y:hidden !important; */
+    /* overflow-x: hidden; */
+    
+}
+.Main_containerr .image 
+{
+    width: 100%;
+    height: 100vh;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+.Detailed_desc
+{
+    width: 1147px;
+    height: 520px;
+    position: absolute;
+    margin-left: 100px;
+    top: 337px;
+    /* background-color: red; */
+    z-index: 3;
+    padding-left:20px ;
+}
+.Down_shadow_second
+ {
+     width: 100%;
+    height: 750px;
+    background-image: linear-gradient(180deg, rgba(0, 0, 0, 0),rgba(0, 0, 0, 0.616),rgb(0, 0, 0));
+    position: absolute;
+    z-index: 2;
+    top: 169px;
+ }
+ .Detailed_desc{
+  display: flex;
+  flex-direction: column;
+  color: white !important;
+  gap: 10px;
+ }
+ .Title{
+    /* background-color: rgb(0, 255, 42); */
+    width: 600px;
+    font-size: 64px;
+    /* text-align: center; */
+    font-family: "Inter", sans-serif;
+    font-weight: 600;
+    
+ }
+ .Genre{
+    /* background-color: rgb(255, 192, 0); */
+    font-family: "Inter", sans-serif;
+    
+    font-size: 20px;
+    font-weight: bold;
+    width: 380px;
+    height: 36px;
+ }
+ .Desc{
+    /* background-color: rgb(209, 14, 14); */
+    width: auto;
+    height: auto;
+    display: flex;
+    /* align-items: center; */
+    gap: 30px;
+    letter-spacing: 7%;
+ }
+.image_2
+{
+width: 183px;
+height: 271px;
+object-fit: cover;
+}
+.Dir_cast_desc_button
+{
+    width: 524px;
+    height: 230px;
+    display: flex;
+    gap: 20px;
+    flex-direction: column;
+    /* background-color: gray; */
+}
+.Imdb_rating
+{
+    width: 224px;
+    height: 230px;
+    display: flex;
+    flex-direction: column;
+    color: azure;
+    display:flex;
+    font-family: "Inter", sans-serif;
+    font-size: 30px;
+    font-weight: bold;
+    justify-content: center;
+    align-items: center;
+    
+    /* background-color: gray; */
+}
+.Dir_name
+{
+    width: auto;
+    height: auto;
+    font-family: "Inter", sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    /* background-color: #fff; */
+}
+.Cast_name
+{
+    width: auto;
+    height: auto;
+    font-family: "Inter", sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    /* background-color: #5a1212; */
+}
+.Movie_desc
+{
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    /* background-color: rgb(180, 51, 51); */
+    font-family: "Inter", sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+}
+.buttons
+{
+    width: 294px;
+    height: auto;
+    font-family: "Inter", sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    /* background-color: #2eb913; */
+    display: flex;
+    gap:20px;
+}
+.Play_now
+{
+    width: 138px;
+    height: 44px;
+    font-family: "Inter", sans-serif;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: bold;
+    background-color: rgba(162, 84, 33, 0.67);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.Watch_later
+{
+    width: 138px;
+    height: 44px;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    background-color: rgba(178, 178, 178, 0.47);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.loader
+{
+    width:100%;
+    height:100%;
+    background-color: rgb(18, 19, 18) !important;
+    /* overflow-x: hidden !important; */
+    overflow-y:hidden !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    z-index: 7;
+}
+.loader > div{
+    width: 50px;
+    height: 50px;
+    /* background-color: #fff; */
+    border-radius: 50%;
+    border: 10px solid #221f1f;
+    animation: rotation 1s  infinite linear;
+
+    border-top-color:rgba(234, 105, 19, 0.63);
+
+}
+.video
+{
+    width: 100%;
+    height: 90vh;
+    position: absolute;
+    object-fit: cover;
+    overflow-y: hidden;
+}
+@keyframes rotation{
+    100%{transform: rotate(360deg);}
+}
+@media(max-width:640px){
+    *,body,#root
+    {
+     width: 390px;
+    }
+.Main_containerr
+{
+    
+    max-width: 390px;
+    height: 450px;
+    
+}
+
+.Main_containerr .image,.video
+{
+    width: 390px;
+    
+    height: 450px;
+    object-fit: cover;
+    position: absolute;
+    top: 0px;
+    left: 0;
+    z-index: 1;
+}
+.Down_shadow_second{
+    height: 190px;
+    top: 260px;
+}
+.Detailed_desc{
+    /* display:none !important; */
+    width: 380px;
+    height: 270px;
+   
+    margin-left: 0px;
+    top: 170px;
+    /* background-color: red; */
+    z-index: 3;
+    padding-left:10px ;
+}
+.Detailed_desc{
+    display: flex;
+    flex-direction: column;
+    color: white !important;
+    gap: 10px;
+   }
+   .Title{
+    /* background-color: rgb(0, 255, 42); */
+    width: 300px;
+    font-size: 34px;
+    /* text-align: center; */
+    font-family: "Inter", sans-serif;
+    font-weight: 600;
+    
+ }
+ .Genre{
+    /* background-color: rgb(255, 192, 0); */
+    font-family: "Inter", sans-serif;
+    
+    font-size: 15px;
+    font-weight: bold;
+    width: 300px;
+    height: 36px;
+ }
+ .Desc{
+    /* background-color: rgb(209, 14, 14); */
+    width: auto;
+    height: auto;
+    display: flex;
+    /* align-items: center; */
+    /* font-size: 10px; */
+    gap: 5px;
+    letter-spacing: 7%;
+ }
+ .image_2
+{
+width: 100px !important;
+height: 150px !important;
+object-fit: cover;
+}
+.Dir_cast_desc_button
+{
+    width: 200px;
+    height: auto;
+    display: flex;
+    gap: 10px;
+    /* background-color: gray; */
+}
+.Imdb_rating
+{
+    width: 100px;
+    height: 124px;
+    font-size: 15px;
+    /* background-color: gray; */
+}
+.Dir_name
+{
+   
+    font-size: 10px;
+   
+}
+.Cast_name
+{
+   
+    font-size: 10px;
+
+}
+.Movie_desc
+{
+   
+    font-size: 10px;
+}
+.buttons
+{
+    width: auto;
+    height: auto;
+    display: flex;
+    /* align-items: center; */
+    gap:10px;
+}
+.Play_now
+{
+    width: 80px;
+    height: 30px;
+    font-size: 10px;
+    gap: 0px;
+}
+.meterial{
+    width: 18px;
+    font-size: 15px;
+}
+.Watch_later
+{
+    width: 80px;
+    height: 30px;
+    font-size: 10px;
+   
+}
+
+}
