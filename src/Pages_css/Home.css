@@ -251,16 +251,23 @@ nav {
 .Movie_list {
     width: 100%;
     margin: 0;
+    position: relative;
 }
 
 .second_swiper {
     width: 100%;
     padding: 10px 0 20px;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.second_swiper:active {
+    cursor: grabbing;
 }
 
 .second_swiper-slide {
-    width: clamp(160px, 20vw, 240px) !important;
-    margin-right: 18px;
+    height: auto;
     background: transparent !important;
     display: flex;
     flex-direction: column;

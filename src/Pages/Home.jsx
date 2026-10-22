@@ -64,20 +64,59 @@ const Home = () => {
 
         {/* Top Picks Row */}
         <div className="Lower_frame_Top_Pickups">
-          <div className="Title_pickup">
-            Top picks for you <i className="material-icons right_arrow">arrow_right_alt</i>
+          <div className="flex items-center justify-between mb-2">
+            <div className="Title_pickup">
+              Top picks for you <i className="material-icons right_arrow">arrow_right_alt</i>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                className="pickup-prev p-2 rounded-full bg-white/10 hover:bg-orange-500 hover:text-white text-neutral-300 transition-all cursor-pointer flex items-center justify-center border border-white/10 shadow-lg"
+                title="Previous movies"
+                aria-label="Previous movies"
+              >
+                <i className="material-icons text-xl leading-none">chevron_left</i>
+              </button>
+              <button
+                type="button"
+                className="pickup-next p-2 rounded-full bg-white/10 hover:bg-orange-500 hover:text-white text-neutral-300 transition-all cursor-pointer flex items-center justify-center border border-white/10 shadow-lg"
+                title="Next movies"
+                aria-label="Next movies"
+              >
+                <i className="material-icons text-xl leading-none">chevron_right</i>
+              </button>
+            </div>
           </div>
 
           <div className="Movie_list">
             <Swiper
-              modules={[Navigation, Pagination, Autoplay]}
+              modules={[Navigation, Autoplay]}
+              navigation={{
+                prevEl: '.pickup-prev',
+                nextEl: '.pickup-next',
+              }}
+              grabCursor={true}
+              simulateTouch={true}
+              touchRatio={1.3}
+              resistance={true}
+              resistanceRatio={0.85}
               loop={true}
-              autoplay={{ delay: 3000 }}
-              slidesPerView={'auto'}
+              autoplay={{ delay: 3500, disableOnInteraction: false, pauseOnMouseEnter: true }}
+              breakpoints={{
+                320: { slidesPerView: 1.8, spaceBetween: 14 },
+                480: { slidesPerView: 2.3, spaceBetween: 16 },
+                640: { slidesPerView: 3.2, spaceBetween: 18 },
+                768: { slidesPerView: 4.2, spaceBetween: 20 },
+                1024: { slidesPerView: 5.2, spaceBetween: 22 },
+                1280: { slidesPerView: 6, spaceBetween: 24 },
+              }}
               className="second_swiper"
             >
-              {movie_pickups.map((movie, index) => (
-                <SwiperSlide key={movie.Movie_title || index} className="second_swiper-slide">
+              {(movie_pickups.length > 0 && movie_pickups.length <= 8
+                ? [...movie_pickups, ...movie_pickups]
+                : movie_pickups
+              ).map((movie, index) => (
+                <SwiperSlide key={`${movie.Movie_title || index}-${index}`} className="second_swiper-slide">
                   <Movies
                     className="second-swiper-movies"
                     image={movie.Movie_poster}

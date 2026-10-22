@@ -240,6 +240,16 @@ const Movs = () => {
   const [dynamicTrailer, setDynamicTrailer] = useState('');
   const bgVideoRef = useRef(null);
 
+  // Scroll to top immediately when viewing a movie
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    if (window.lenis) {
+      window.lenis.scrollTo(0, { immediate: true });
+    }
+  }, [id]);
+
   // Dynamic fetch for official Cloudinary video trailer from backend
   useEffect(() => {
     let isMounted = true;
