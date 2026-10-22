@@ -1,7 +1,6 @@
 import React from 'react';
 import '../Pages_css/Footer.css';
 import { Link } from 'react-router-dom';
-import ScrollPercentageIndicator from './ScrollPercentageIndicator';
 
 const Footer = () => {
   return (
@@ -60,13 +59,10 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom Bar with Scroll Indicator */}
+        {/* Bottom Bar */}
         <div className="Footer_Bottom">
           <div>
             &copy; {new Date().getFullYear()} Ami Watch. All rights reserved. Powered by Vite + React.
-          </div>
-          <div className="flex items-center gap-4">
-            <ScrollPercentageIndicator />
           </div>
         </div>
       </div>
