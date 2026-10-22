@@ -59,7 +59,6 @@ const Home = () => {
                 </div>
               </Swiper>
             </div>
-            <div className="Circle"></div>
           </div>
         </div>
 

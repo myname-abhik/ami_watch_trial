@@ -92,11 +92,17 @@ const Signup = () =>  {
   };
 
   return (
-    <div
-      className="min-h-[80vh] flex items-center justify-center bg-cover bg-center font-inter"
-      style={{ backgroundImage: "url('login.jpg')" }} // Using the uploaded image as background
-    >
-      <div className="flex flex-col md:flex-row bg-black bg-opacity-80 rounded-xl shadow-2xl overflow-hidden max-w-4xl w-full mx-4">
+    <div className="min-h-screen flex items-center justify-center bg-black pt-24 pb-16 px-4 font-inter relative">
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="fixed top-0 left-0 w-full h-full object-cover -z-10 brightness-40 blur-md pointer-events-none"
+      >
+        <source src="https://videos.pexels.com/video-files/3129540/3129540-uhd_2560_1440_30fps.mp4" type="video/mp4" />
+      </video>
+      <div className="flex flex-col md:flex-row bg-neutral-900/90 backdrop-blur-xl border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden max-w-4xl w-full">
         {/* Left Section - Image Slider */}
         <div className="hidden md:flex md:w-1/2 items-center justify-center p-8 relative">
           <img

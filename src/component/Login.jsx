@@ -79,20 +79,18 @@ const Login = () =>  {
 
   return (
     <div
-      className="min-h-[80vh] flex items-center justify-center bg-cover bg-center font-inter "
-      style={{ backgroundImage: "url('login.jpg')" }} // Using the uploaded image as background
+      className="min-h-screen flex items-center justify-center bg-black pt-24 pb-16 px-4 font-inter relative"
     >
-     <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="absolute top-0 left-0 w-full h-full object-cover -z-10 brightness-50 blur-lg"
-            >
-                <source src="https://videos.pexels.com/video-files/3129540/3129540-uhd_2560_1440_30fps.mp4" type="video/mp4" />
-                Your browser does not support the video tag.
-            </video>
-      <div className="flex flex-col md:flex-row bg-black bg-opacity-80 rounded-xl shadow-2xl overflow-hidden  w-full mx-4 mt-[8%] mb-[8%] max-w-[500px] border-2 border-gray-800 p-8 cursor-pointer hover:bg-gray-800 transition-all duration-[250ms] ease-linear  hover:scale-[100%]  hover:translate-y-[-10px] " >
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="fixed top-0 left-0 w-full h-full object-cover -z-10 brightness-40 blur-md pointer-events-none"
+      >
+        <source src="https://videos.pexels.com/video-files/3129540/3129540-uhd_2560_1440_30fps.mp4" type="video/mp4" />
+      </video>
+      <div className="bg-neutral-900/90 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden w-full max-w-[460px] border border-neutral-800 p-6 sm:p-8" >
         {/* Left Section - Image Slider */}
        
 
