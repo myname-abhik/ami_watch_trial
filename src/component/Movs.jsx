@@ -322,7 +322,7 @@ const Movs = () => {
 
     const prettyTitle = rawId
       .split(/[-_ ]+/)
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .map((w) => (w ? w.charAt(0).toUpperCase() + w.slice(1) : ''))
       .join(' ');
 
     const fallbackObj = {
@@ -356,9 +356,15 @@ const Movs = () => {
         year: backendMovie.Year || fallbackObj.year,
         director: backendMovie.Dir || fallbackObj.director,
         cast: backendMovie.Cast
-          ? typeof backendMovie.Cast === 'string'
+          ? Array.isArray(backendMovie.Cast)
+            ? backendMovie.Cast.map((item) =>
+                typeof item === 'string'
+                  ? { name: item, role: 'Cast Member' }
+                  : { name: item?.name || 'Cast Member', role: item?.role || 'Actor' }
+              )
+            : typeof backendMovie.Cast === 'string'
             ? backendMovie.Cast.split(',').map((c) => ({ name: c.trim(), role: 'Cast Member' }))
-            : backendMovie.Cast
+            : fallbackObj.cast
           : fallbackObj.cast,
         genres: backendMovie.Genres
           ? Array.isArray(backendMovie.Genres)
@@ -871,20 +877,25 @@ const Movs = () => {
         {/* Tab 2: Cast */}
         {activeTab === 'cast' && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16">
-            {movie.cast.map((c) => (
-              <div
-                key={c.name}
-                className="bg-neutral-900/80 border border-neutral-800 rounded-2xl p-4 flex items-center gap-3"
-              >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center font-bold text-sm text-white flex-shrink-0">
-                  {c.name.charAt(0)}
+            {movie.cast.map((c, idx) => {
+              const actorName = typeof c === 'string' ? c : c?.name || 'Cast Member';
+              const actorRole = typeof c === 'string' ? 'Cast Member' : c?.role || 'Actor';
+              const initial = actorName ? actorName.charAt(0).toUpperCase() : 'A';
+              return (
+                <div
+                  key={`${actorName}-${idx}`}
+                  className="bg-neutral-900/80 border border-neutral-800 rounded-2xl p-4 flex items-center gap-3"
+                >
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center font-bold text-sm text-white flex-shrink-0">
+                    {initial}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold text-white truncate">{actorName}</div>
+                    <div className="text-[11px] text-neutral-400 truncate">{actorRole}</div>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <div className="text-xs font-bold text-white truncate">{c.name}</div>
-                  <div className="text-[11px] text-neutral-400 truncate">{c.role}</div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
