@@ -241,6 +241,7 @@ const Movs = () => {
   const bgVideoRef = useRef(null);
 
   const [backendMovie, setBackendMovie] = useState(null);
+  const [allBackendMovies, setAllBackendMovies] = useState([]);
 
   // Scroll to top immediately when viewing a movie
   useEffect(() => {
@@ -260,7 +261,8 @@ const Movs = () => {
         const res = await fetch('https://cv-backend-theta.vercel.app/use/insert');
         if (!res.ok) return;
         const data = await res.json();
-        if (Array.isArray(data)) {
+        if (Array.isArray(data) && isMounted) {
+          setAllBackendMovies(data);
           const rawId = decodeURIComponent(id || '').trim().toLowerCase().replace(/[-_ ]/g, '');
           const match = data.find((item) => {
             const title = (item.Movie || item.title || '').toLowerCase().replace(/[-_ ]/g, '');
@@ -525,12 +527,23 @@ const Movs = () => {
     setTimeout(() => setToastMessage(''), 2500);
   };
 
-  // Recommendations: Other movies excluding current
+  // Recommendations: Live API movies first, pausing static local catalog when API is active
   const recommendations = useMemo(() => {
+    if (allBackendMovies.length > 0) {
+      return allBackendMovies
+        .filter((m) => (m.Movie || m.title || '').toLowerCase() !== movie.title.toLowerCase())
+        .map((m) => ({
+          title: m.Movie || m.title,
+          poster: m.Poster || m.Image || '/Movie_content/1299334.jpg',
+          rating: m.Rating || '8.5',
+          year: m.Year || '2023',
+        }))
+        .slice(0, 4);
+    }
     return Object.values(MOVIE_DATABASE)
       .filter((m) => m.title.toLowerCase() !== movie.title.toLowerCase())
       .slice(0, 4);
-  }, [movie.title]);
+  }, [movie.title, allBackendMovies]);
 
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-orange-500 selection:text-white">

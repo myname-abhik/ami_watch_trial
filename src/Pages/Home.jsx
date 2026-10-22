@@ -12,40 +12,60 @@ import Crousal from '../component/Crousal';
 import movies from '../assets/Movies_info/Movies_info.json';
 import defaultPickups from '../assets/Movies_info/Movie_pickup.json';
 import Movies from '../component/Movies';
-import axios from 'axios';
 
 const Home = () => {
-  const [movie_pickups, SetMovie_pickups] = useState(defaultPickups);
-  const [heroMovies, setHeroMovies] = useState(movies);
+  const [movie_pickups, SetMovie_pickups] = useState([]);
+  const [heroMovies, setHeroMovies] = useState([]);
 
   useEffect(() => {
     let isMounted = true;
 
     const fetchAllData = async () => {
-      // 1. Fetch pickups API
+      // 1. Execute API call first for main hero catalog
       try {
-        const pResponse = await axios.get(`https://cv-backend-theta.vercel.app/use/movie_pickup/insert`, { timeout: 4000 });
-        if (pResponse.data && Array.isArray(pResponse.data) && pResponse.data.length > 0 && isMounted) {
-          SetMovie_pickups(pResponse.data);
+        const mRes = await fetch('https://cv-backend-theta.vercel.app/use/insert');
+        if (mRes.ok) {
+          const mData = await mRes.json();
+          if (Array.isArray(mData) && mData.length > 0 && isMounted) {
+            const formatted = mData.map((item) => ({
+              Movie: item.Movie || item.title,
+              Poster: item.Poster || item.Image || '/Movie_content/1299334.jpg',
+              Image: item.Image || item.Poster || '/Movie_content/1299334.jpg',
+              Description: item.Description || 'Stream now in 4K Ultra HD on Ami Watch.',
+              Genres: Array.isArray(item.Genres)
+                ? item.Genres
+                : typeof item.Genres === 'string'
+                ? item.Genres.split(',').map((s) => s.trim())
+                : ['Featured'],
+            }));
+            setHeroMovies(formatted);
+          } else if (isMounted) {
+            setHeroMovies(movies);
+          }
+        } else if (isMounted) {
+          setHeroMovies(movies);
         }
       } catch (e) {
-        console.warn('Backend pickups notice, using static fallback:', e.message);
+        console.warn('Main API call unavailable, falling back to local catalog:', e);
+        if (isMounted) setHeroMovies(movies);
       }
 
-      // 2. Fetch main movie insert API
+      // 2. Execute API call first for top picks
       try {
-        const mResponse = await axios.get(`https://cv-backend-theta.vercel.app/use/insert`, { timeout: 4000 });
-        if (mResponse.data && Array.isArray(mResponse.data) && mResponse.data.length > 0 && isMounted) {
-          const formatted = mResponse.data.map((item) => ({
-            Movie: item.Movie || item.title,
-            Poster: item.Poster || item.Image || '/Movie_content/1299334.jpg',
-            Description: item.Description || 'Stream now in 4K Ultra HD on Ami Watch.',
-            Genres: Array.isArray(item.Genres) ? item.Genres : typeof item.Genres === 'string' ? item.Genres.split(',').map(s=>s.trim()) : ['Featured'],
-          }));
-          setHeroMovies(formatted);
+        const pRes = await fetch('https://cv-backend-theta.vercel.app/use/movie_pickup/insert');
+        if (pRes.ok) {
+          const pData = await pRes.json();
+          if (Array.isArray(pData) && pData.length > 0 && isMounted) {
+            SetMovie_pickups(pData);
+          } else if (isMounted) {
+            SetMovie_pickups(defaultPickups);
+          }
+        } else if (isMounted) {
+          SetMovie_pickups(defaultPickups);
         }
       } catch (e) {
-        console.warn('Backend main catalog notice, using static fallback:', e.message);
+        console.warn('Pickups API call unavailable, falling back to local catalog:', e);
+        if (isMounted) SetMovie_pickups(defaultPickups);
       }
     };
 
@@ -61,26 +81,35 @@ const Home = () => {
         <div className="Upper_frame">
           <div className="Crousal_section">
             <div className="swiper-container first_swiper-container">
-              <Swiper
-                modules={[Navigation, Pagination, Autoplay]}
-                pagination={{ clickable: true }}
-                loop={true}
-                autoplay={{ delay: 4000, disableOnInteraction: true }}
-              >
-                <div className="swiper-wrapper Copy_Swiper">
-                  {heroMovies.map((movie, index) => (
-                    <SwiperSlide key={`${movie.Movie || index}-${index}`}>
-                      <Crousal
-                        image={movie.Poster}
-                        ele={movie.Movie}
-                        Description={movie.Description}
-                        genre={movie.Genres}
-                        name={movie.Movie}
-                      />
-                    </SwiperSlide>
-                  ))}
+              {heroMovies.length > 0 ? (
+                <Swiper
+                  modules={[Navigation, Pagination, Autoplay]}
+                  pagination={{ clickable: true }}
+                  loop={heroMovies.length > 1}
+                  autoplay={{ delay: 4000, disableOnInteraction: true }}
+                >
+                  <div className="swiper-wrapper Copy_Swiper">
+                    {heroMovies.map((movie, index) => (
+                      <SwiperSlide key={`${movie.Movie || index}-${index}`}>
+                        <Crousal
+                          image={movie.Image || movie.Poster}
+                          ele={movie.Movie}
+                          Description={movie.Description}
+                          genre={movie.Genres}
+                          name={movie.Movie}
+                        />
+                      </SwiperSlide>
+                    ))}
+                  </div>
+                </Swiper>
+              ) : (
+                <div className="w-full h-96 bg-neutral-900/60 animate-pulse rounded-3xl flex items-center justify-center text-neutral-500">
+                  <div className="flex items-center gap-3">
+                    <span className="w-3 h-3 rounded-full bg-orange-500 animate-ping" />
+                    <span>Loading Live Carousel...</span>
+                  </div>
                 </div>
-              </Swiper>
+              )}
             </div>
           </div>
         </div>

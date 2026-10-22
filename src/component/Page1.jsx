@@ -36,12 +36,42 @@ const Page1 = () => {
   const { id } = useParams();
   const movieTitle = decodeURIComponent(id || 'Featured Stream');
 
+  const [apiMovies, setApiMovies] = React.useState([]);
+
+  React.useEffect(() => {
+    let isMounted = true;
+    fetch('https://cv-backend-theta.vercel.app/use/insert')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0 && isMounted) {
+          setApiMovies(data);
+        }
+      })
+      .catch((err) => console.warn('Page1 API notice:', err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   // Related recommendations
   const relatedMovies = React.useMemo(() => {
-    const list = [...moviesInfo.map((m) => ({ title: m.Movie, poster: m.Poster })),
-                  ...moviePickups.map((m) => ({ title: m.Movie_title, poster: m.Movie_poster }))];
+    if (apiMovies.length > 0) {
+      return apiMovies
+        .filter((m) => (m.Movie || m.title || '').toLowerCase() !== movieTitle.toLowerCase())
+        .map((m) => ({
+          title: m.Movie || m.title,
+          poster: m.Poster || m.Image || '/Movie_content/1299334.jpg',
+        }))
+        .slice(0, 4);
+    }
+
+    const list = [
+      ...moviesInfo.map((m) => ({ title: m.Movie, poster: m.Poster })),
+      ...moviePickups.map((m) => ({ title: m.Movie_title, poster: m.Movie_poster })),
+    ];
     return list.filter((m) => m.title.toLowerCase() !== movieTitle.toLowerCase()).slice(0, 4);
-  }, [movieTitle]);
+  }, [apiMovies, movieTitle]);
 
   React.useEffect(() => {
     if (!videoRef.current) return;
