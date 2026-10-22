@@ -87,7 +87,7 @@ const Watchlist = () => {
                   </Link>
                   <div className="flex items-center justify-between mt-2 pt-2 border-t border-neutral-800/80 text-[11px] text-neutral-400">
                     <span className="text-orange-400 font-medium">★ {movie.rating}</span>
-                    <span>{movie.features}</span>
+                    <span>{Array.isArray(movie.features) ? movie.features.join(' • ') : movie.features}</span>
                   </div>
                 </div>
               </div>

@@ -11,6 +11,9 @@ const Mov = () => {
   const [searchFilter, setSearchFilter] = useState('');
   const [watchlistTitles, setWatchlistTitles] = useState([]);
   const [toastMessage, setToastMessage] = useState('');
+  const [backendMovies, setBackendMovies] = useState([]);
+  const [backendPickups, setBackendPickups] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Sync watchlist state
   useEffect(() => {
@@ -29,32 +32,69 @@ const Mov = () => {
     return () => window.removeEventListener('ami-watchlist-updated', updateList);
   }, []);
 
+  // Fetch live backend movie catalog
+  useEffect(() => {
+    let isMounted = true;
+    const fetchApiData = async () => {
+      try {
+        setIsLoading(true);
+        const [moviesRes, pickupsRes] = await Promise.allSettled([
+          fetch('https://cv-backend-theta.vercel.app/use/insert'),
+          fetch('https://cv-backend-theta.vercel.app/use/movie_pickup/insert'),
+        ]);
+
+        if (moviesRes.status === 'fulfilled' && moviesRes.value.ok) {
+          const mData = await moviesRes.value.json();
+          if (Array.isArray(mData) && isMounted) {
+            setBackendMovies(mData);
+          }
+        }
+
+        if (pickupsRes.status === 'fulfilled' && pickupsRes.value.ok) {
+          const pData = await pickupsRes.value.json();
+          if (Array.isArray(pData) && isMounted) {
+            setBackendPickups(pData);
+          }
+        }
+      } catch (err) {
+        console.warn('Backend fetch notice:', err);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+
+    fetchApiData();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(''), 3000);
   };
 
-  // Compile full movie catalog
+  // Compile full unified movie catalog from static JSON and live APIs
   const allMovies = useMemo(() => {
     const map = new Map();
 
-    // From Movies_info.json
+    // 1. Static Movies_info.json
     moviesInfo.forEach((m) => {
       map.set(m.Movie.toLowerCase(), {
         title: m.Movie,
         poster: m.Poster || '/Movie_content/1299334.jpg',
-        genres: m.Genres || ['Drama'],
+        genres: Array.isArray(m.Genres) ? m.Genres : [m.Genres || 'Drama'],
         features: Array.isArray(m.Features) ? m.Features : ['Sub', 'Dub'],
-        description: m.Description,
-        rating: 8.5,
-        year: 2023,
+        description: m.Description || 'Stream now in HD on Ami Watch.',
+        rating: parseFloat(m.Rating || '8.5'),
+        year: parseInt(m.Year || '2023', 10),
       });
     });
 
-    // From Movie_pickup.json
+    // 2. Static Movie_pickup.json
     moviePickups.forEach((m) => {
-      const key = m.Movie_title.toLowerCase();
-      if (!map.has(key)) {
+      const key = (m.Movie_title || '').toLowerCase();
+      if (key && !map.has(key)) {
         map.set(key, {
           title: m.Movie_title,
           poster: m.Movie_poster || '/Movie_content/1299334.jpg',
@@ -67,10 +107,60 @@ const Mov = () => {
       }
     });
 
-    return Array.from(map.values());
-  }, []);
+    // 3. Live backend movies
+    if (backendMovies.length > 0) {
+      backendMovies.forEach((m) => {
+        const title = m.Movie || m.title;
+        if (!title) return;
+        const key = title.toLowerCase();
+        const existing = map.get(key) || {};
 
-  const genres = ['All', 'Anime', 'Drama', 'Fantasy', 'Gangster', 'Crime', 'Supernatural', 'Romance', 'Action'];
+        let genresList = ['Drama'];
+        if (Array.isArray(m.Genres)) genresList = m.Genres;
+        else if (typeof m.Genres === 'string') genresList = m.Genres.split(',').map((s) => s.trim());
+        else if (existing.genres) genresList = existing.genres;
+
+        let featuresList = ['Sub', 'Dub'];
+        if (Array.isArray(m.Features)) featuresList = m.Features;
+        else if (typeof m.Features === 'string') featuresList = [m.Features];
+        else if (existing.features) featuresList = existing.features;
+
+        map.set(key, {
+          title: title,
+          poster: m.Poster || m.Image || existing.poster || '/Movie_content/1299334.jpg',
+          genres: genresList,
+          features: featuresList,
+          description: m.Description || existing.description || 'Watch on Ami Watch in Ultra HD.',
+          rating: parseFloat(m.Rating || existing.rating || '8.5'),
+          year: parseInt(m.Year || existing.year || '2023', 10),
+        });
+      });
+    }
+
+    // 4. Live backend pickups
+    if (backendPickups.length > 0) {
+      backendPickups.forEach((m) => {
+        const title = m.Movie_title || m.title || m.Movie;
+        if (!title) return;
+        const key = title.toLowerCase();
+        if (!map.has(key)) {
+          map.set(key, {
+            title: title,
+            poster: m.Movie_poster || m.Poster || '/Movie_content/1299334.jpg',
+            genres: ['Popular', 'Drama'],
+            features: [m.Movie_feature || 'Sub'],
+            description: 'Popular fan favorite title streaming now on Ami Watch.',
+            rating: 8.3,
+            year: 2023,
+          });
+        }
+      });
+    }
+
+    return Array.from(map.values());
+  }, [backendMovies, backendPickups]);
+
+  const genres = ['All', 'Anime', 'Drama', 'Fantasy', 'Gangster', 'Crime', 'Supernatural', 'Romance', 'Action', 'Sci-Fi', 'Biography'];
 
   // Filtered and sorted movies
   const filteredMovies = useMemo(() => {
@@ -151,7 +241,7 @@ const Mov = () => {
             <select
               value={selectedFeature}
               onChange={(e) => setSelectedFeature(e.target.value)}
-              className="bg-neutral-800 border border-neutral-700 text-neutral-200 text-xs md:text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-orange-500"
+              className="bg-neutral-800 border border-neutral-700 text-neutral-200 text-xs md:text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-orange-500 cursor-pointer"
             >
               <option value="All">All Audio (Sub/Dub)</option>
               <option value="Sub">Subtitled</option>
@@ -161,7 +251,7 @@ const Mov = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="bg-neutral-800 border border-neutral-700 text-neutral-200 text-xs md:text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-orange-500"
+              className="bg-neutral-800 border border-neutral-700 text-neutral-200 text-xs md:text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-orange-500 cursor-pointer"
             >
               <option value="rating">Top Rated</option>
               <option value="title">Alphabetical (A-Z)</option>
@@ -176,7 +266,7 @@ const Mov = () => {
             <button
               key={g}
               onClick={() => setSelectedGenre(g)}
-              className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
+              className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all cursor-pointer ${
                 selectedGenre === g
                   ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
                   : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
@@ -195,6 +285,12 @@ const Mov = () => {
             {selectedGenre === 'All' ? 'All Titles' : `${selectedGenre} Titles`}
             <span className="text-neutral-500 text-sm font-normal ml-2">({filteredMovies.length} available)</span>
           </h2>
+          {isLoading && (
+            <div className="flex items-center gap-2 text-xs text-orange-400 font-medium animate-pulse">
+              <span className="w-2 h-2 rounded-full bg-orange-500" />
+              Syncing live catalog...
+            </div>
+          )}
         </div>
 
         {filteredMovies.length > 0 ? (
@@ -247,7 +343,7 @@ const Mov = () => {
                     {/* Bookmark / Watchlist Button */}
                     <button
                       onClick={(e) => handleToggleWatchlist(movie, e)}
-                      className={`absolute top-2 right-2 p-1.5 rounded-full backdrop-blur-md transition-colors ${
+                      className={`absolute top-2 right-2 p-1.5 rounded-full backdrop-blur-md transition-colors cursor-pointer ${
                         bookmarked
                           ? 'bg-orange-500 text-white'
                           : 'bg-black/60 text-white/80 hover:bg-orange-500 hover:text-white'
@@ -268,12 +364,12 @@ const Mov = () => {
                         {movie.title}
                       </Link>
                       <p className="text-[11px] text-neutral-400 mt-0.5 line-clamp-1">
-                        {movie.genres.join(' • ')}
+                        {Array.isArray(movie.genres) ? movie.genres.join(' • ') : movie.genres}
                       </p>
                     </div>
 
                     <div className="flex items-center justify-between mt-3 pt-2 border-t border-neutral-800/80 text-[10px] text-neutral-500">
-                      <span>{movie.features.join(' / ')}</span>
+                      <span>{Array.isArray(movie.features) ? movie.features.join(' / ') : movie.features}</span>
                       <span>HD</span>
                     </div>
                   </div>
@@ -294,7 +390,7 @@ const Mov = () => {
                 setSelectedFeature('All');
                 setSearchFilter('');
               }}
-              className="mt-4 px-5 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold transition-colors"
+              className="mt-4 px-5 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold transition-colors cursor-pointer"
             >
               Reset Filters
             </button>
@@ -306,3 +402,4 @@ const Mov = () => {
 };
 
 export default Mov;
+

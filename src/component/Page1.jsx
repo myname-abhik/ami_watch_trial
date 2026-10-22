@@ -57,12 +57,12 @@ const Page1 = () => {
       autoplay: true,
       sources: [
         {
-          src: specificMovieVideo,
-          type: "video/mp4",
-        },
-        {
           src: videoLink,
           type: "application/x-mpegURL",
+        },
+        {
+          src: specificMovieVideo,
+          type: "video/mp4",
         },
       ],
     };
@@ -163,6 +163,10 @@ const Page1 = () => {
                   src={m.poster}
                   alt={m.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = '/Movie_content/1299334.jpg';
+                  }}
                 />
               </div>
               <span className="text-xs font-semibold text-neutral-200 group-hover:text-orange-400 truncate">
@@ -177,3 +181,9 @@ const Page1 = () => {
 };
 
 export default Page1;
+
+
+
+
+
+
