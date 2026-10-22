@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import moviesInfo from '../assets/Movies_info/Movies_info.json';
 import moviePickups from '../assets/Movies_info/Movie_pickup.json';
 import { isInWatchlist, toggleWatchlist } from '../utils/watchlist';
 
-// Rich catalog database with accurate metadata
+// Rich catalog database with accurate metadata and official Cloudinary trailers
 const MOVIE_DATABASE = {
   'suzume': {
     title: 'Suzume',
@@ -26,7 +26,7 @@ const MOVIE_DATABASE = {
     backdrop: '/Movie_content/1299334.jpg',
     audio: 'Japanese (Dolby 5.1), English (Dubbed)',
     subtitles: 'English, Japanese, Spanish, French',
-    trailer: 'https://videos.pexels.com/video-files/3129540/3129540-uhd_2560_1440_30fps.mp4',
+    trailer: 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1742597568/nrngavphybpyggcgqdrf.mp4',
   },
   'peaky-blinders': {
     title: 'Peaky Blinders',
@@ -48,7 +48,7 @@ const MOVIE_DATABASE = {
     backdrop: '/Movie_content/HD-wallpaper-peaky-blinders-thomas-shelby-tv-series.jpg',
     audio: 'English (Original Dolby 5.1)',
     subtitles: 'English, Spanish, French, German',
-    trailer: 'https://videos.pexels.com/video-files/3129540/3129540-uhd_2560_1440_30fps.mp4',
+    trailer: 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1742598852/Oppenheimer___New_Trailer_xbbcal.mp4',
   },
   'spirited away': {
     title: 'Spirited Away',
@@ -70,7 +70,7 @@ const MOVIE_DATABASE = {
     backdrop: '/Movie_content/spirited-away-4k-upscaled-samples-v0-7uhyv9zj4dea1.webp',
     audio: 'Japanese (Original), English (Dubbed)',
     subtitles: 'English, Japanese, Spanish',
-    trailer: 'https://videos.pexels.com/video-files/3129540/3129540-uhd_2560_1440_30fps.mp4',
+    trailer: 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1742597568/nrngavphybpyggcgqdrf.mp4',
   },
   'the-wind-rises': {
     title: 'The Wind Rises',
@@ -92,7 +92,7 @@ const MOVIE_DATABASE = {
     backdrop: '/Movie_content/the-wind-rises-wallpaper-17c1169820060d9969b728ab21c2d546.jpg',
     audio: 'Japanese (Original), English',
     subtitles: 'English, Spanish',
-    trailer: 'https://videos.pexels.com/video-files/3129540/3129540-uhd_2560_1440_30fps.mp4',
+    trailer: 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1742597568/nrngavphybpyggcgqdrf.mp4',
   },
   '20th century girl': {
     title: '20th Century Girl',
@@ -114,7 +114,7 @@ const MOVIE_DATABASE = {
     backdrop: '/Movie_content/20th_Century_Girl.jpg',
     audio: 'Korean (Original), English',
     subtitles: 'English, Korean, Spanish',
-    trailer: 'https://videos.pexels.com/video-files/3129540/3129540-uhd_2560_1440_30fps.mp4',
+    trailer: 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1742599098/20th_Century_Girl___Official_Trailer___Netflix_ENG_SUB_flu6u2.mp4',
   },
   'hometown cha-cha-cha': {
     title: 'Hometown Cha-Cha-Cha',
@@ -135,7 +135,7 @@ const MOVIE_DATABASE = {
     backdrop: '/Movie_content/MV5BNDFkYmM3MGMtYWIwNC00ZDkxLWFjZjItYmQ4NTdiZWNjMzczXkEyXkFqcGc@._V1_.jpg',
     audio: 'Korean (Original)',
     subtitles: 'English, Korean',
-    trailer: 'https://videos.pexels.com/video-files/3129540/3129540-uhd_2560_1440_30fps.mp4',
+    trailer: 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1742598176/Hometown_Cha-Cha-Cha___Official_Trailer___Netflix_ENG_SUB_znyxvo.mp4',
   },
   'oppenheimer': {
     title: 'Oppenheimer',
@@ -157,7 +157,7 @@ const MOVIE_DATABASE = {
     backdrop: '/Movie_content/MV5BM2MyYjg0NWMtMjUyMy00Mzg4LTk5NDYtYzcxNmJhOTVhMmU0XkEyXkFqcGc@._V1_.jpg',
     audio: 'English (Original Dolby Atmos)',
     subtitles: 'English, Spanish, French',
-    trailer: 'https://videos.pexels.com/video-files/3129540/3129540-uhd_2560_1440_30fps.mp4',
+    trailer: 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1742598852/Oppenheimer___New_Trailer_xbbcal.mp4',
   },
   'impossible - dead reckoning': {
     title: 'Mission: Impossible - Dead Reckoning',
@@ -179,7 +179,29 @@ const MOVIE_DATABASE = {
     backdrop: '/Movie_content/Tom.jpg',
     audio: 'English (Original Dolby Atmos)',
     subtitles: 'English, Spanish, French',
-    trailer: 'https://videos.pexels.com/video-files/3129540/3129540-uhd_2560_1440_30fps.mp4',
+    trailer: 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1751394489/MI7_DIGITAL_DOM-TRLR-2-NO-GC_TXTD_STEREO_HD_PRORES_2398_051523_zoa5js.mp4',
+  },
+  'dead reckoning': {
+    title: 'Mission: Impossible - Dead Reckoning',
+    year: '2023',
+    age: 'PG-13',
+    runtime: '2h 43m',
+    rating: '7.7',
+    match: '94%',
+    genres: ['Action', 'Adventure', 'Thriller'],
+    director: 'Christopher McQuarrie',
+    cast: [
+      { name: 'Tom Cruise', role: 'Ethan Hunt' },
+      { name: 'Hayley Atwell', role: 'Grace' },
+      { name: 'Ving Rhames', role: 'Luther Stickell' },
+      { name: 'Simon Pegg', role: 'Benji Dunn' },
+    ],
+    description: 'Ethan Hunt and his IMF team must track down a terrifying rogue artificial intelligence before it falls into the hands of a dangerous new enemy from his past.',
+    poster: '/Movie_content/Tom.jpg',
+    backdrop: '/Movie_content/Tom.jpg',
+    audio: 'English (Original Dolby Atmos)',
+    subtitles: 'English, Spanish, French',
+    trailer: 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1751394489/MI7_DIGITAL_DOM-TRLR-2-NO-GC_TXTD_STEREO_HD_PRORES_2398_051523_zoa5js.mp4',
   },
   'interstellar': {
     title: 'Interstellar',
@@ -201,7 +223,7 @@ const MOVIE_DATABASE = {
     backdrop: '/Movie_content/inter.jpg',
     audio: 'English (Original Dolby Atmos)',
     subtitles: 'English, Spanish, French, German',
-    trailer: 'https://videos.pexels.com/video-files/3129540/3129540-uhd_2560_1440_30fps.mp4',
+    trailer: 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1751371370/SSYouTube.online_Interstellar_2014_Trailer___4K_Ultra_HD_1080p_vhusgs.mp4',
   },
 };
 
@@ -211,26 +233,79 @@ const Movs = () => {
   const [inList, setInList] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
+  const [hasTrailerStarted, setHasTrailerStarted] = useState(false);
+  const [isPaused, setIsPaused] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+  const [countdown, setCountdown] = useState(3);
+  const [dynamicTrailer, setDynamicTrailer] = useState('');
+  const bgVideoRef = useRef(null);
+
+  // Dynamic fetch for official Cloudinary video trailer from backend
+  useEffect(() => {
+    let isMounted = true;
+    const fetchBackendTrailer = async () => {
+      try {
+        const res = await fetch('https://cv-backend-theta.vercel.app/use/insert');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          const rawId = decodeURIComponent(id || '').trim().toLowerCase().replace(/[-_]/g, ' ');
+          const match = data.find((item) => {
+            const title = (item.Movie || '').toLowerCase().replace(/[-_]/g, ' ');
+            return (
+              title === rawId ||
+              rawId.includes(title) ||
+              title.includes(rawId) ||
+              title.replace(/\s+/g, '') === rawId.replace(/\s+/g, '')
+            );
+          });
+          if (match && match.Video && isMounted) {
+            setDynamicTrailer(match.Video);
+          }
+        }
+      } catch {
+        // Fallback to MOVIE_DATABASE
+      }
+    };
+
+    fetchBackendTrailer();
+    return () => {
+      isMounted = false;
+    };
+  }, [id]);
 
   // Resolve movie details
   const movie = useMemo(() => {
     const rawId = decodeURIComponent(id || '').trim();
-    const normalizedKey = rawId.toLowerCase().replace(/_/g, ' ');
+    const normalizedKey = rawId.toLowerCase().replace(/_/g, ' ').replace(/-/g, ' ');
 
     if (MOVIE_DATABASE[normalizedKey]) {
       return MOVIE_DATABASE[normalizedKey];
     }
+    if (MOVIE_DATABASE[rawId.toLowerCase()]) {
+      return MOVIE_DATABASE[rawId.toLowerCase()];
+    }
 
-    // Match by partial title
+    // Match by normalized partial title
+    const cleanInput = normalizedKey.replace(/[^a-z0-9]/g, '');
     for (const [key, value] of Object.entries(MOVIE_DATABASE)) {
-      if (key.includes(normalizedKey) || normalizedKey.includes(key)) {
+      const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (cleanKey === cleanInput || cleanKey.includes(cleanInput) || cleanInput.includes(cleanKey)) {
         return value;
       }
     }
 
     // Check raw json files
-    const foundInfo = moviesInfo.find((m) => m.Movie.toLowerCase() === normalizedKey);
-    const foundPickup = moviePickups.find((m) => m.Movie_title.toLowerCase() === normalizedKey);
+    const foundInfo = moviesInfo.find(
+      (m) =>
+        m.Movie.toLowerCase().replace(/[-_ ]/g, '') === cleanInput ||
+        m.Movie.toLowerCase().includes(normalizedKey)
+    );
+    const foundPickup = moviePickups.find(
+      (m) =>
+        m.Movie_title.toLowerCase().replace(/[-_ ]/g, '') === cleanInput ||
+        m.Movie_title.toLowerCase().includes(normalizedKey)
+    );
 
     const prettyTitle = rawId
       .split(/[-_ ]+/)
@@ -257,9 +332,141 @@ const Movs = () => {
       backdrop: foundInfo?.Poster || foundPickup?.Movie_poster || '/Movie_content/1299334.jpg',
       audio: 'English (Original), Japanese',
       subtitles: 'English, Spanish, French',
-      trailer: 'https://videos.pexels.com/video-files/3129540/3129540-uhd_2560_1440_30fps.mp4',
+      trailer: 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1742598852/Oppenheimer___New_Trailer_xbbcal.mp4',
     };
   }, [id]);
+
+  const effectiveTrailer = dynamicTrailer || movie.trailer;
+
+  // Auto-play trailer timer in background after initial delay
+  useEffect(() => {
+    setHasTrailerStarted(false);
+    setIsPaused(true);
+    setCountdown(3);
+
+    const video = bgVideoRef.current;
+    if (video) {
+      video.pause();
+      video.currentTime = 0;
+    }
+
+    const interval = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    const timer = setTimeout(() => {
+      setHasTrailerStarted(true);
+      const v = bgVideoRef.current;
+      if (v) {
+        v.play()
+          .then(() => {
+            setIsPaused(false);
+          })
+          .catch(() => {
+            setIsPaused(true);
+          });
+      }
+    }, 3500);
+
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
+  }, [id, movie.title, effectiveTrailer]);
+
+  const startTrailerImmediately = (e) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    setCountdown(0);
+    setHasTrailerStarted(true);
+    const video = bgVideoRef.current;
+    if (video) {
+      video
+        .play()
+        .then(() => {
+          setIsPaused(false);
+        })
+        .catch(() => {
+          setIsPaused(true);
+        });
+    }
+  };
+
+  const togglePlayPause = (e) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    const video = bgVideoRef.current;
+    if (!video) return;
+
+    if (video.paused) {
+      video
+        .play()
+        .then(() => {
+          setIsPaused(false);
+        })
+        .catch((err) => {
+          console.warn('Play error:', err);
+        });
+    } else {
+      video.pause();
+      setIsPaused(true);
+    }
+  };
+
+  const toggleMute = (e) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    const video = bgVideoRef.current;
+    if (video) {
+      const nextMuted = !video.muted;
+      video.muted = nextMuted;
+      setIsMuted(nextMuted);
+    } else {
+      setIsMuted((prev) => !prev);
+    }
+  };
+
+  const handleReplay = (e) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    const video = bgVideoRef.current;
+    if (!video) return;
+    video.currentTime = 0;
+    video
+      .play()
+      .then(() => {
+        setIsPaused(false);
+      })
+      .catch(() => {});
+  };
+
+  const handleOpenTrailerModal = () => {
+    const video = bgVideoRef.current;
+    if (video && !video.paused) {
+      video.pause();
+      setIsPaused(true);
+    }
+    setShowTrailer(true);
+  };
+
+  const handleCloseTrailerModal = () => {
+    setShowTrailer(false);
+    const video = bgVideoRef.current;
+    if (video && hasTrailerStarted) {
+      video
+        .play()
+        .then(() => {
+          setIsPaused(false);
+        })
+        .catch(() => {});
+    }
+  };
 
   // Sync Watchlist
   useEffect(() => {
@@ -312,16 +519,16 @@ const Movs = () => {
                 {movie.title} — Official Trailer
               </h3>
               <button
-                onClick={() => setShowTrailer(false)}
-                className="p-1.5 rounded-full text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
+                onClick={handleCloseTrailerModal}
+                className="p-1.5 rounded-full text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors cursor-pointer"
                 title="Close trailer"
               >
                 <i className="material-icons text-lg">close</i>
               </button>
             </div>
             <div className="aspect-video w-full bg-black">
-              <video controls autoPlay className="w-full h-full object-cover">
-                <source src={movie.trailer} type="video/mp4" />
+              <video key={`modal-${effectiveTrailer}`} controls autoPlay className="w-full h-full object-cover">
+                <source src={effectiveTrailer} type="video/mp4" />
                 Your browser does not support video playback.
               </video>
             </div>
@@ -329,22 +536,109 @@ const Movs = () => {
         </div>
       )}
 
-      {/* Hero Section with Backdrop */}
+      {/* Hero Section with Backdrop & Timed Background Video */}
       <div className="relative w-full min-h-[600px] md:min-h-[680px] flex items-end">
-        {/* Background Artwork */}
-        <div className="absolute inset-0 z-0 overflow-hidden">
+        {/* Background Artwork & Timed Trailer */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          {/* Static Backdrop Image */}
           <img
             src={movie.backdrop}
             alt={movie.title}
-            className="w-full h-full object-cover object-top filter brightness-[0.38] saturate-[1.1] scale-105"
+            className={`w-full h-full object-cover object-top filter brightness-[0.38] saturate-[1.1] scale-105 transition-opacity duration-1000 ${
+              hasTrailerStarted ? 'opacity-0' : 'opacity-100'
+            }`}
             onError={(e) => {
               e.target.onerror = null;
               e.target.src = '/Movie_content/1299334.jpg';
             }}
           />
+
+          {/* Background Trailer Video */}
+          <video
+            ref={bgVideoRef}
+            key={`bg-${effectiveTrailer}`}
+            src={effectiveTrailer}
+            muted={isMuted}
+            playsInline
+            loop
+            preload="auto"
+            onPlay={() => setIsPaused(false)}
+            onPause={() => setIsPaused(true)}
+            onEnded={() => setIsPaused(true)}
+            onVolumeChange={() => setIsMuted(bgVideoRef.current?.muted ?? true)}
+            className={`absolute inset-0 w-full h-full object-cover filter brightness-[0.45] saturate-[1.15] scale-105 transition-opacity duration-1000 ${
+              hasTrailerStarted ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+
           {/* Gradients */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent pointer-events-none" />
+        </div>
+
+        {/* Ambient Video Control Badge in bottom right - elevated to z-30 pointer-events-auto */}
+        <div className="absolute bottom-6 right-4 sm:right-6 md:right-12 z-30 flex items-center gap-2 pointer-events-auto">
+          {!hasTrailerStarted && countdown > 0 ? (
+            <button
+              type="button"
+              onClick={startTrailerImmediately}
+              className="px-4 py-2 rounded-full bg-black/80 backdrop-blur-md border border-orange-500/50 hover:border-orange-400 text-neutral-100 hover:text-white text-xs flex items-center gap-2.5 transition-all shadow-2xl cursor-pointer group"
+              title="Click to start trailer immediately"
+            >
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-orange-500"></span>
+              </span>
+              <span className="font-semibold">Trailer begins in {countdown}s</span>
+              <span className="text-[10px] uppercase font-bold text-orange-400 bg-orange-500/20 px-1.5 py-0.5 rounded border border-orange-500/40 group-hover:bg-orange-500 group-hover:text-white transition-colors">
+                Play Now
+              </span>
+            </button>
+          ) : (
+            <div className="flex items-center gap-2 bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 shadow-2xl">
+              <div className="flex items-center gap-2 text-xs font-semibold text-neutral-300 pr-2 border-r border-white/15 hidden sm:flex">
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    isPaused ? 'bg-amber-400' : 'bg-emerald-500 animate-pulse'
+                  }`}
+                />
+                <span className="truncate max-w-[140px] text-neutral-200">
+                  {isPaused ? 'Trailer Paused' : 'Official Trailer'}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={togglePlayPause}
+                className="p-2 rounded-full bg-white/10 hover:bg-white/25 active:scale-90 text-white hover:text-orange-400 transition-all cursor-pointer flex items-center justify-center"
+                title={isPaused ? 'Resume trailer' : 'Pause trailer'}
+                aria-label={isPaused ? 'Resume trailer' : 'Pause trailer'}
+              >
+                <i className="material-icons text-base leading-none">
+                  {isPaused ? 'play_arrow' : 'pause'}
+                </i>
+              </button>
+              <button
+                type="button"
+                onClick={toggleMute}
+                className="p-2 rounded-full bg-white/10 hover:bg-white/25 active:scale-90 text-white hover:text-orange-400 transition-all cursor-pointer flex items-center justify-center"
+                title={isMuted ? 'Unmute trailer' : 'Mute trailer'}
+                aria-label={isMuted ? 'Unmute trailer' : 'Mute trailer'}
+              >
+                <i className="material-icons text-base leading-none">
+                  {isMuted ? 'volume_off' : 'volume_up'}
+                </i>
+              </button>
+              <button
+                type="button"
+                onClick={handleReplay}
+                className="p-2 rounded-full bg-white/10 hover:bg-white/25 active:scale-90 text-white hover:text-orange-400 transition-all cursor-pointer flex items-center justify-center"
+                title="Replay trailer from start"
+                aria-label="Replay trailer from start"
+              >
+                <i className="material-icons text-base leading-none">replay</i>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Hero Content Container */}
@@ -444,8 +738,8 @@ const Movs = () => {
 
                 <button
                   type="button"
-                  onClick={() => setShowTrailer(true)}
-                  className="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-sm border border-white/15 backdrop-blur-md flex items-center gap-2 transition-all hover:scale-105"
+                  onClick={handleOpenTrailerModal}
+                  className="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-sm border border-white/15 backdrop-blur-md flex items-center gap-2 transition-all hover:scale-105 cursor-pointer"
                 >
                   <i className="material-icons text-lg text-orange-400">play_circle_outline</i>
                   <span>Watch Trailer</span>

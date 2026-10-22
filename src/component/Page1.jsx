@@ -6,6 +6,30 @@ import { useParams, Link } from 'react-router-dom';
 import moviesInfo from '../assets/Movies_info/Movies_info.json';
 import moviePickups from '../assets/Movies_info/Movie_pickup.json';
 
+const MOVIE_VIDEOS = {
+  'spirited away': 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1742597568/nrngavphybpyggcgqdrf.mp4',
+  '20th century girl': 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1742599098/20th_Century_Girl___Official_Trailer___Netflix_ENG_SUB_flu6u2.mp4',
+  'hometown cha-cha-cha': 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1742598176/Hometown_Cha-Cha-Cha___Official_Trailer___Netflix_ENG_SUB_znyxvo.mp4',
+  'interstellar': 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1751371370/SSYouTube.online_Interstellar_2014_Trailer___4K_Ultra_HD_1080p_vhusgs.mp4',
+  'oppenheimer': 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1742598852/Oppenheimer___New_Trailer_xbbcal.mp4',
+  'dead reckoning': 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1751394489/MI7_DIGITAL_DOM-TRLR-2-NO-GC_TXTD_STEREO_HD_PRORES_2398_051523_zoa5js.mp4',
+  'impossible - dead reckoning': 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1751394489/MI7_DIGITAL_DOM-TRLR-2-NO-GC_TXTD_STEREO_HD_PRORES_2398_051523_zoa5js.mp4',
+  'suzume': 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1742597568/nrngavphybpyggcgqdrf.mp4',
+  'the-wind-rises': 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1742597568/nrngavphybpyggcgqdrf.mp4',
+  'peaky-blinders': 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1742598852/Oppenheimer___New_Trailer_xbbcal.mp4',
+};
+
+const resolveMovieVideo = (rawTitle) => {
+  const clean = (rawTitle || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  for (const [key, val] of Object.entries(MOVIE_VIDEOS)) {
+    const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (cleanKey === clean || cleanKey.includes(clean) || clean.includes(cleanKey)) {
+      return val;
+    }
+  }
+  return 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1742598852/Oppenheimer___New_Trailer_xbbcal.mp4';
+};
+
 const Page1 = () => {
   const videoRef = React.useRef(null);
   const playerRef = React.useRef(null);
@@ -22,8 +46,9 @@ const Page1 = () => {
   React.useEffect(() => {
     if (!videoRef.current) return;
 
+    const specificMovieVideo = resolveMovieVideo(id);
     const videoLink = `https://final-ffmpeg.vercel.app/hls/${id}/index.m3u8`;
-    const fallbackLink = "https://videos.pexels.com/video-files/3129540/3129540-uhd_2560_1440_30fps.mp4";
+    const fallbackLink = specificMovieVideo;
 
     const options = {
       controls: true,
@@ -32,12 +57,12 @@ const Page1 = () => {
       autoplay: true,
       sources: [
         {
-          src: videoLink,
-          type: "application/x-mpegURL",
+          src: specificMovieVideo,
+          type: "video/mp4",
         },
         {
-          src: fallbackLink,
-          type: "video/mp4",
+          src: videoLink,
+          type: "application/x-mpegURL",
         },
       ],
     };
