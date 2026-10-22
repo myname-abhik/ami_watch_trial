@@ -240,6 +240,8 @@ const Movs = () => {
   const [dynamicTrailer, setDynamicTrailer] = useState('');
   const bgVideoRef = useRef(null);
 
+  const [backendMovie, setBackendMovie] = useState(null);
+
   // Scroll to top immediately when viewing a movie
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
@@ -250,18 +252,18 @@ const Movs = () => {
     }
   }, [id]);
 
-  // Dynamic fetch for official Cloudinary video trailer from backend
+  // Dynamic fetch for live movie details & official video trailer from backend
   useEffect(() => {
     let isMounted = true;
-    const fetchBackendTrailer = async () => {
+    const fetchBackendData = async () => {
       try {
         const res = await fetch('https://cv-backend-theta.vercel.app/use/insert');
         if (!res.ok) return;
         const data = await res.json();
         if (Array.isArray(data)) {
-          const rawId = decodeURIComponent(id || '').trim().toLowerCase().replace(/[-_]/g, ' ');
+          const rawId = decodeURIComponent(id || '').trim().toLowerCase().replace(/[-_ ]/g, '');
           const match = data.find((item) => {
-            const title = (item.Movie || '').toLowerCase().replace(/[-_]/g, ' ');
+            const title = (item.Movie || item.title || '').toLowerCase().replace(/[-_ ]/g, '');
             return (
               title === rawId ||
               rawId.includes(title) ||
@@ -269,51 +271,50 @@ const Movs = () => {
               title.replace(/\s+/g, '') === rawId.replace(/\s+/g, '')
             );
           });
-          if (match && match.Video && isMounted) {
-            setDynamicTrailer(match.Video);
+          if (match && isMounted) {
+            setBackendMovie(match);
+            if (match.Video) {
+              setDynamicTrailer(match.Video);
+            }
           }
         }
       } catch {
-        // Fallback to MOVIE_DATABASE
+        // Fallback to MOVIE_DATABASE and static JSON
       }
     };
 
-    fetchBackendTrailer();
+    fetchBackendData();
     return () => {
       isMounted = false;
     };
   }, [id]);
 
-  // Resolve movie details
+  // Resolve movie details dynamically
   const movie = useMemo(() => {
     const rawId = decodeURIComponent(id || '').trim();
     const normalizedKey = rawId.toLowerCase().replace(/_/g, ' ').replace(/-/g, ' ');
 
-    if (MOVIE_DATABASE[normalizedKey]) {
-      return MOVIE_DATABASE[normalizedKey];
-    }
-    if (MOVIE_DATABASE[rawId.toLowerCase()]) {
-      return MOVIE_DATABASE[rawId.toLowerCase()];
-    }
+    let base = MOVIE_DATABASE[normalizedKey] || MOVIE_DATABASE[rawId.toLowerCase()];
 
-    // Match by normalized partial title
-    const cleanInput = normalizedKey.replace(/[^a-z0-9]/g, '');
-    for (const [key, value] of Object.entries(MOVIE_DATABASE)) {
-      const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
-      if (cleanKey === cleanInput || cleanKey.includes(cleanInput) || cleanInput.includes(cleanKey)) {
-        return value;
+    if (!base) {
+      const cleanInput = normalizedKey.replace(/[^a-z0-9]/g, '');
+      for (const [key, value] of Object.entries(MOVIE_DATABASE)) {
+        const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (cleanKey === cleanInput || cleanKey.includes(cleanInput) || cleanInput.includes(cleanKey)) {
+          base = value;
+          break;
+        }
       }
     }
 
-    // Check raw json files
     const foundInfo = moviesInfo.find(
       (m) =>
-        m.Movie.toLowerCase().replace(/[-_ ]/g, '') === cleanInput ||
+        m.Movie.toLowerCase().replace(/[-_ ]/g, '') === normalizedKey.replace(/[^a-z0-9]/g, '') ||
         m.Movie.toLowerCase().includes(normalizedKey)
     );
     const foundPickup = moviePickups.find(
       (m) =>
-        m.Movie_title.toLowerCase().replace(/[-_ ]/g, '') === cleanInput ||
+        m.Movie_title.toLowerCase().replace(/[-_ ]/g, '') === normalizedKey.replace(/[^a-z0-9]/g, '') ||
         m.Movie_title.toLowerCase().includes(normalizedKey)
     );
 
@@ -322,29 +323,51 @@ const Movs = () => {
       .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
       .join(' ');
 
-    return {
-      title: prettyTitle,
-      year: '2023',
-      age: '13+',
-      runtime: '2h 10m',
-      rating: '8.4',
-      match: '95%',
-      genres: foundInfo?.Genres || ['Drama', 'Featured'],
-      director: 'Featured Director',
-      cast: [
-        { name: 'Leading Cast Ensemble', role: 'Lead Character' },
-        { name: 'Supporting Actor', role: 'Supporting' },
+    const fallbackObj = {
+      title: base?.title || foundInfo?.Movie || foundPickup?.Movie_title || prettyTitle,
+      year: base?.year || foundInfo?.Year || '2023',
+      age: base?.age || '13+',
+      runtime: base?.runtime || '2h 10m',
+      rating: base?.rating || foundInfo?.Rating || '8.4',
+      match: base?.match || '95%',
+      genres: base?.genres || (foundInfo?.Genres ? (Array.isArray(foundInfo.Genres) ? foundInfo.Genres : [foundInfo.Genres]) : ['Drama', 'Featured']),
+      director: base?.director || foundInfo?.Dir || 'Featured Director',
+      cast: base?.cast || [
+        { name: typeof foundInfo?.Cast === 'string' ? foundInfo.Cast : 'Leading Ensemble', role: 'Main Cast' },
       ],
-      description:
-        foundInfo?.Description ||
-        'An extraordinary cinematic experience streaming in high definition with pristine surround sound on Ami Watch.',
-      poster: foundInfo?.Poster || foundPickup?.Movie_poster || '/Movie_content/1299334.jpg',
-      backdrop: foundInfo?.Poster || foundPickup?.Movie_poster || '/Movie_content/1299334.jpg',
-      audio: 'English (Original), Japanese',
-      subtitles: 'English, Spanish, French',
-      trailer: 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1742598852/Oppenheimer___New_Trailer_xbbcal.mp4',
+      description: base?.description || foundInfo?.Description || 'An extraordinary cinematic experience streaming on Ami Watch.',
+      poster: base?.poster || foundInfo?.Poster || foundPickup?.Movie_poster || '/Movie_content/1299334.jpg',
+      backdrop: base?.backdrop || foundInfo?.Poster || foundPickup?.Movie_poster || '/Movie_content/1299334.jpg',
+      audio: base?.audio || 'English (Original), Japanese',
+      subtitles: base?.subtitles || 'English, Spanish, French',
+      trailer: base?.trailer || 'https://res.cloudinary.com/dfkhg7gkp/video/upload/v1742598852/Oppenheimer___New_Trailer_xbbcal.mp4',
     };
-  }, [id]);
+
+    if (backendMovie) {
+      return {
+        ...fallbackObj,
+        title: backendMovie.Movie || fallbackObj.title,
+        poster: backendMovie.Poster || backendMovie.Image || fallbackObj.poster,
+        backdrop: backendMovie.Image || backendMovie.Poster || fallbackObj.backdrop,
+        description: backendMovie.Description || fallbackObj.description,
+        rating: backendMovie.Rating || fallbackObj.rating,
+        year: backendMovie.Year || fallbackObj.year,
+        director: backendMovie.Dir || fallbackObj.director,
+        cast: backendMovie.Cast
+          ? typeof backendMovie.Cast === 'string'
+            ? backendMovie.Cast.split(',').map((c) => ({ name: c.trim(), role: 'Cast Member' }))
+            : backendMovie.Cast
+          : fallbackObj.cast,
+        genres: backendMovie.Genres
+          ? Array.isArray(backendMovie.Genres)
+            ? backendMovie.Genres
+            : backendMovie.Genres.split(',').map((s) => s.trim())
+          : fallbackObj.genres,
+      };
+    }
+
+    return fallbackObj;
+  }, [id, backendMovie]);
 
   const effectiveTrailer = dynamicTrailer || movie.trailer;
 

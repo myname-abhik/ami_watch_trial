@@ -18,44 +18,87 @@ const Navbar = () => {
   const mobileSearchRef = useRef(null);
   const browseRef = useRef(null);
   const navigate = useNavigate();
+  const [backendItems, setBackendItems] = useState([]);
 
-  // Combine and deduplicate movie catalogue for comprehensive search
+  // Dynamic API catalog fetch
+  useEffect(() => {
+    let isMounted = true;
+    const fetchSearchCatalog = async () => {
+      try {
+        const res = await fetch('https://cv-backend-theta.vercel.app/use/insert');
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && isMounted) {
+            setBackendItems(data);
+          }
+        }
+      } catch {
+        // Fallback to static catalog
+      }
+    };
+    fetchSearchCatalog();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Combine and deduplicate movie catalogue for comprehensive search (API active -> pause local catalog)
   const movieCatalog = useMemo(() => {
     const list = [];
     const seenTitles = new Set();
+    const hasLiveApi = backendItems.length > 0;
 
-    moviesInfo.forEach((item) => {
-      const title = item.Movie;
-      if (!seenTitles.has(title.toLowerCase())) {
-        seenTitles.add(title.toLowerCase());
-        list.push({
-          title: item.Movie,
-          poster: item.Poster || '/Movie_content/1299334.jpg',
-          genres: item.Genres || ['Drama'],
-          features: Array.isArray(item.Features) ? item.Features.join(' • ') : 'Sub • Dub',
-          description: item.Description || '',
-          rating: '8.4',
-        });
-      }
-    });
+    if (hasLiveApi) {
+      // Use EXCLUSIVELY Live API items when active
+      backendItems.forEach((item) => {
+        const title = item.Movie || item.title;
+        if (title && !seenTitles.has(title.toLowerCase())) {
+          seenTitles.add(title.toLowerCase());
+          list.push({
+            title: title,
+            poster: item.Poster || item.Image || '/Movie_content/1299334.jpg',
+            genres: Array.isArray(item.Genres) ? item.Genres : typeof item.Genres === 'string' ? item.Genres.split(',').map(s=>s.trim()) : ['Featured'],
+            features: Array.isArray(item.Features) ? item.Features.join(' • ') : item.Features || 'Sub • Dub',
+            description: item.Description || 'Stream on Ami Watch.',
+            rating: item.Rating || '8.5',
+          });
+        }
+      });
+    } else {
+      // Fallback to static catalog ONLY if API is offline
+      moviesInfo.forEach((item) => {
+        const title = item.Movie;
+        if (title && !seenTitles.has(title.toLowerCase())) {
+          seenTitles.add(title.toLowerCase());
+          list.push({
+            title: item.Movie,
+            poster: item.Poster || '/Movie_content/1299334.jpg',
+            genres: item.Genres || ['Drama'],
+            features: Array.isArray(item.Features) ? item.Features.join(' • ') : 'Sub • Dub',
+            description: item.Description || '',
+            rating: '8.4',
+          });
+        }
+      });
 
-    moviePickups.forEach((item) => {
-      const title = item.Movie_title;
-      if (!seenTitles.has(title.toLowerCase())) {
-        seenTitles.add(title.toLowerCase());
-        list.push({
-          title: item.Movie_title,
-          poster: item.Movie_poster || '/Movie_content/1299334.jpg',
-          genres: ['Popular', 'Featured'],
-          features: item.Movie_feature || 'Sub',
-          description: 'A popular selection curated for you.',
-          rating: '8.1',
-        });
-      }
-    });
+      moviePickups.forEach((item) => {
+        const title = item.Movie_title;
+        if (title && !seenTitles.has(title.toLowerCase())) {
+          seenTitles.add(title.toLowerCase());
+          list.push({
+            title: item.Movie_title,
+            poster: item.Movie_poster || '/Movie_content/1299334.jpg',
+            genres: ['Popular', 'Featured'],
+            features: item.Movie_feature || 'Sub',
+            description: 'A popular selection curated for you.',
+            rating: '8.1',
+          });
+        }
+      });
+    }
 
     return list;
-  }, []);
+  }, [backendItems]);
 
   // Debounce search query (250ms)
   useEffect(() => {

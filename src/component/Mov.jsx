@@ -74,84 +74,82 @@ const Mov = () => {
     setTimeout(() => setToastMessage(''), 3000);
   };
 
-  // Compile full unified movie catalog from static JSON and live APIs
+  // Compile movie catalog (Uses Live API exclusively when active, local catalog paused)
   const allMovies = useMemo(() => {
     const map = new Map();
+    const hasLiveApi = backendMovies.length > 0 || backendPickups.length > 0;
 
-    // 1. Static Movies_info.json
-    moviesInfo.forEach((m) => {
-      map.set(m.Movie.toLowerCase(), {
-        title: m.Movie,
-        poster: m.Poster || '/Movie_content/1299334.jpg',
-        genres: Array.isArray(m.Genres) ? m.Genres : [m.Genres || 'Drama'],
-        features: Array.isArray(m.Features) ? m.Features : ['Sub', 'Dub'],
-        description: m.Description || 'Stream now in HD on Ami Watch.',
-        rating: parseFloat(m.Rating || '8.5'),
-        year: parseInt(m.Year || '2023', 10),
-      });
-    });
+    if (hasLiveApi) {
+      // Use EXCLUSIVELY Live API Data when available
+      if (backendMovies.length > 0) {
+        backendMovies.forEach((m) => {
+          const title = m.Movie || m.title;
+          if (!title) return;
+          const key = title.toLowerCase();
 
-    // 2. Static Movie_pickup.json
-    moviePickups.forEach((m) => {
-      const key = (m.Movie_title || '').toLowerCase();
-      if (key && !map.has(key)) {
-        map.set(key, {
-          title: m.Movie_title,
-          poster: m.Movie_poster || '/Movie_content/1299334.jpg',
-          genres: ['Popular', 'Drama'],
-          features: [m.Movie_feature || 'Sub'],
-          description: 'Popular fan favorite title streaming now on Ami Watch.',
-          rating: 8.2,
-          year: 2022,
-        });
-      }
-    });
+          let genresList = ['Drama'];
+          if (Array.isArray(m.Genres)) genresList = m.Genres;
+          else if (typeof m.Genres === 'string') genresList = m.Genres.split(',').map((s) => s.trim());
 
-    // 3. Live backend movies
-    if (backendMovies.length > 0) {
-      backendMovies.forEach((m) => {
-        const title = m.Movie || m.title;
-        if (!title) return;
-        const key = title.toLowerCase();
-        const existing = map.get(key) || {};
+          let featuresList = ['Sub', 'Dub'];
+          if (Array.isArray(m.Features)) featuresList = m.Features;
+          else if (typeof m.Features === 'string') featuresList = [m.Features];
 
-        let genresList = ['Drama'];
-        if (Array.isArray(m.Genres)) genresList = m.Genres;
-        else if (typeof m.Genres === 'string') genresList = m.Genres.split(',').map((s) => s.trim());
-        else if (existing.genres) genresList = existing.genres;
-
-        let featuresList = ['Sub', 'Dub'];
-        if (Array.isArray(m.Features)) featuresList = m.Features;
-        else if (typeof m.Features === 'string') featuresList = [m.Features];
-        else if (existing.features) featuresList = existing.features;
-
-        map.set(key, {
-          title: title,
-          poster: m.Poster || m.Image || existing.poster || '/Movie_content/1299334.jpg',
-          genres: genresList,
-          features: featuresList,
-          description: m.Description || existing.description || 'Watch on Ami Watch in Ultra HD.',
-          rating: parseFloat(m.Rating || existing.rating || '8.5'),
-          year: parseInt(m.Year || existing.year || '2023', 10),
-        });
-      });
-    }
-
-    // 4. Live backend pickups
-    if (backendPickups.length > 0) {
-      backendPickups.forEach((m) => {
-        const title = m.Movie_title || m.title || m.Movie;
-        if (!title) return;
-        const key = title.toLowerCase();
-        if (!map.has(key)) {
           map.set(key, {
             title: title,
-            poster: m.Movie_poster || m.Poster || '/Movie_content/1299334.jpg',
+            poster: m.Poster || m.Image || '/Movie_content/1299334.jpg',
+            genres: genresList,
+            features: featuresList,
+            description: m.Description || 'Watch on Ami Watch in Ultra HD.',
+            rating: parseFloat(m.Rating || '8.5'),
+            year: parseInt(m.Year || '2023', 10),
+          });
+        });
+      }
+
+      if (backendPickups.length > 0) {
+        backendPickups.forEach((m) => {
+          const title = m.Movie_title || m.title || m.Movie;
+          if (!title) return;
+          const key = title.toLowerCase();
+          if (!map.has(key)) {
+            map.set(key, {
+              title: title,
+              poster: m.Movie_poster || m.Poster || '/Movie_content/1299334.jpg',
+              genres: ['Popular', 'Drama'],
+              features: [m.Movie_feature || 'Sub'],
+              description: 'Popular fan favorite title streaming now on Ami Watch.',
+              rating: 8.3,
+              year: 2023,
+            });
+          }
+        });
+      }
+    } else {
+      // ONLY fallback to static local catalog when API is offline / empty
+      moviesInfo.forEach((m) => {
+        map.set(m.Movie.toLowerCase(), {
+          title: m.Movie,
+          poster: m.Poster || '/Movie_content/1299334.jpg',
+          genres: Array.isArray(m.Genres) ? m.Genres : [m.Genres || 'Drama'],
+          features: Array.isArray(m.Features) ? m.Features : ['Sub', 'Dub'],
+          description: m.Description || 'Stream now in HD on Ami Watch.',
+          rating: parseFloat(m.Rating || '8.5'),
+          year: parseInt(m.Year || '2023', 10),
+        });
+      });
+
+      moviePickups.forEach((m) => {
+        const key = (m.Movie_title || '').toLowerCase();
+        if (key && !map.has(key)) {
+          map.set(key, {
+            title: m.Movie_title,
+            poster: m.Movie_poster || '/Movie_content/1299334.jpg',
             genres: ['Popular', 'Drama'],
             features: [m.Movie_feature || 'Sub'],
             description: 'Popular fan favorite title streaming now on Ami Watch.',
-            rating: 8.3,
-            year: 2023,
+            rating: 8.2,
+            year: 2022,
           });
         }
       });

@@ -16,20 +16,43 @@ import axios from 'axios';
 
 const Home = () => {
   const [movie_pickups, SetMovie_pickups] = useState(defaultPickups);
+  const [heroMovies, setHeroMovies] = useState(movies);
 
   useEffect(() => {
-    const fetchData = async () => {
+    let isMounted = true;
+
+    const fetchAllData = async () => {
+      // 1. Fetch pickups API
       try {
-        const response = await axios.get(`https://cv-backend-theta.vercel.app/use/movie_pickup/insert`, { timeout: 3000 });
-        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-          SetMovie_pickups(response.data);
+        const pResponse = await axios.get(`https://cv-backend-theta.vercel.app/use/movie_pickup/insert`, { timeout: 4000 });
+        if (pResponse.data && Array.isArray(pResponse.data) && pResponse.data.length > 0 && isMounted) {
+          SetMovie_pickups(pResponse.data);
         }
       } catch (e) {
-        console.warn('Backend unavailable, using default movie picks:', e.message);
+        console.warn('Backend pickups notice, using static fallback:', e.message);
+      }
+
+      // 2. Fetch main movie insert API
+      try {
+        const mResponse = await axios.get(`https://cv-backend-theta.vercel.app/use/insert`, { timeout: 4000 });
+        if (mResponse.data && Array.isArray(mResponse.data) && mResponse.data.length > 0 && isMounted) {
+          const formatted = mResponse.data.map((item) => ({
+            Movie: item.Movie || item.title,
+            Poster: item.Poster || item.Image || '/Movie_content/1299334.jpg',
+            Description: item.Description || 'Stream now in 4K Ultra HD on Ami Watch.',
+            Genres: Array.isArray(item.Genres) ? item.Genres : typeof item.Genres === 'string' ? item.Genres.split(',').map(s=>s.trim()) : ['Featured'],
+          }));
+          setHeroMovies(formatted);
+        }
+      } catch (e) {
+        console.warn('Backend main catalog notice, using static fallback:', e.message);
       }
     };
 
-    fetchData();
+    fetchAllData();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (
@@ -45,8 +68,8 @@ const Home = () => {
                 autoplay={{ delay: 4000, disableOnInteraction: true }}
               >
                 <div className="swiper-wrapper Copy_Swiper">
-                  {movies.map((movie, index) => (
-                    <SwiperSlide key={movie.Movie || index}>
+                  {heroMovies.map((movie, index) => (
+                    <SwiperSlide key={`${movie.Movie || index}-${index}`}>
                       <Crousal
                         image={movie.Poster}
                         ele={movie.Movie}
@@ -151,7 +174,7 @@ const Home = () => {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
-              {movies.map((m) => (
+              {heroMovies.map((m) => (
                 <Link
                   key={m.Movie}
                   to={`/Movies/${encodeURIComponent(m.Movie)}`}
@@ -162,6 +185,10 @@ const Home = () => {
                       src={m.Poster}
                       alt={m.Movie}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = '/Movie_content/1299334.jpg';
+                      }}
                     />
                   </div>
                   <div className="p-3.5">
